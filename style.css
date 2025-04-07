@@ -1,0 +1,403 @@
+/* --- Google Font Import --- */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
+
+/* --- Base Styles & Variables --- */
+:root {
+    --primary-color: #007bff; /* Blue */
+    --secondary-color: #6c757d; /* Gray */
+    --success-color: #28a745; /* Green */
+    --danger-color: #dc3545; /* Red */
+    --warning-color: #ffc107; /* Yellow */
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --background-color: #eef2f7; /* Lighter blue-gray background */
+    --card-background: #ffffff;
+    --text-color: #333;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --transition-speed: 0.3s;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    line-height: 1.7;
+    margin: 0;
+    padding: 20px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-size: 16px; /* Slightly larger base font size */
+}
+
+.container {
+    max-width: 800px; /* Slightly wider */
+    margin: 20px auto;
+    background: transparent; /* Container is just for centering */
+    padding: 0; /* Remove padding from container */
+}
+
+/* --- Card Style for Sections --- */
+.card {
+    background: var(--card-background);
+    padding: 25px 30px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    margin-bottom: 25px;
+    border: 1px solid #e0e0e0;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    color: var(--dark-color);
+}
+
+header h1 {
+    font-size: 2.5em;
+    font-weight: 700;
+    margin: 0;
+    color: var(--primary-color);
+}
+
+h2 {
+    font-size: 1.8em;
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+    display: inline-block; /* Keep border tight */
+}
+
+h3.controls-title {
+    font-size: 1.4em;
+    color: var(--secondary-color);
+    margin-top: 25px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* --- Icons --- */
+.icon {
+    margin-right: 8px;
+    display: inline-block; /* Prevent wrapping */
+}
+
+/* --- File Loader --- */
+.file-loader {
+    text-align: center;
+}
+
+.file-input-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+}
+
+.file-label {
+    font-weight: bold;
+    margin-right: 10px;
+    color: var(--secondary-color);
+}
+
+input[type="file"] {
+    /* Hiding the default input but keeping it accessible */
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
+}
+
+/* Custom file input button styling */
+input[type="file"] + label {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease;
+    display: inline-block;
+    margin-right: 10px;
+}
+input[type="file"] + label:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+.file-name-display {
+    font-style: italic;
+    color: var(--secondary-color);
+    margin-left: 10px; /* Add space between button and name */
+}
+
+.loading {
+    color: var(--primary-color);
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.message {
+    font-size: 0.95em;
+    color: var(--secondary-color);
+    margin-top: 10px;
+    min-height: 40px; /* Reserve space */
+}
+.message.error {
+    color: var(--danger-color);
+    font-weight: bold;
+}
+
+/* --- Game Area --- */
+.status-bar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    font-weight: bold;
+    padding: 10px 15px;
+    background: #e9ecef; /* Light gray background */
+    border-radius: var(--border-radius);
+    font-size: 1.1em;
+}
+.status-item {
+     color: var(--dark-color);
+}
+
+.info-area {
+    margin-bottom: 25px;
+    padding: 15px;
+    background: #e6f2ff; /* Light blue background */
+    border: 1px solid #b3d7ff;
+    border-radius: var(--border-radius);
+    text-align: center;
+}
+.info-area strong {
+    color: var(--primary-color);
+    font-size: 1.2em;
+    margin-right: 10px;
+}
+.target-meaning {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: var(--dark-color);
+}
+
+
+/* --- Controls (Select Lists) --- */
+.controls {
+    display: flex;
+    justify-content: space-around;
+    gap: 15px; /* Space between control groups */
+    margin-bottom: 15px;
+    flex-wrap: wrap; /* Allow wrapping */
+}
+
+.control-group {
+    flex: 1; /* Each group takes equal space */
+    min-width: 180px; /* Minimum width before wrapping */
+    text-align: center;
+    background-color: #f8f9fa; /* Light background for group */
+    padding: 15px;
+    border: 1px solid #dee2e6;
+    border-radius: var(--border-radius);
+}
+
+.control-group label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: var(--secondary-color);
+    font-size: 1.1em;
+}
+
+select {
+    width: 100%;
+    padding: 10px; /* More padding inside select */
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    background-color: white;
+    font-size: 1em; /* Ensure readable font size */
+    min-height: 150px; /* Increase height */
+    cursor: pointer;
+    transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* Focus ring */
+}
+/* Styling select options is limited, but some browsers support this */
+select option {
+    padding: 8px; /* More padding for options */
+    font-size: 1em;
+}
+
+
+/* --- Results Area --- */
+.results-area {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: var(--border-radius);
+}
+.result-item {
+    font-weight: bold;
+    margin-bottom: 10px;
+    padding: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    word-wrap: break-word;
+}
+.result-item span {
+    font-weight: normal;
+    color: var(--primary-color);
+    margin-left: 5px;
+}
+
+.feedback-box {
+    margin-top: 15px;
+    padding: 12px 15px;
+    border-radius: var(--border-radius);
+    font-weight: bold;
+    min-height: 60px;
+    border: 2px dashed #ccc; /* Dashed border initially */
+    background-color: var(--card-background);
+    transition: all var(--transition-speed) ease; /* Smooth transition for feedback */
+    line-height: 1.5; /* Improve readability of multi-line feedback */
+}
+
+.feedback-box.correct {
+    color: var(--success-color);
+    border-color: var(--success-color);
+    background-color: #e9f7ef; /* Light green background */
+    border-style: solid;
+}
+
+.feedback-box.incorrect {
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+    background-color: #fdecea; /* Light red background */
+    border-style: solid;
+}
+
+
+.game-area {
+    position: relative; /* 讓 sticky 定位相對於此 */
+    /* 可能需要設定一個最小高度或確保其可以滾動內部內容 */
+    /* 例如： padding-bottom: 80px; /* 為固定的按鈕區留出空間 */
+}
+
+/* --- Buttons --- */
+.button-group {
+    position: sticky;
+    bottom: 15px; /* 距離 game-area 底部的距離 */
+    background-color: var(--card-background); /* 給個背景色避免透明 */
+    padding: 10px 0; /* 增加一點上下內邊距 */
+    margin-top: 15px; /* 保持與上方元素的距離 */
+    z-index: 10; /* 確保在其他元素之上 */
+    border-top: 1px solid #eee; /* 可選：加個分隔線 */
+}
+
+/*
+.button-group {
+    text-align: center;
+    margin-top: 25px;
+}
+*/
+.btn {
+    background-color: var(--secondary-color); /* Default gray */
+    color: white;
+    border: none;
+    padding: 12px 25px; /* Larger padding */
+    border-radius: 25px; /* Pill shape */
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: all var(--transition-speed) ease;
+    margin: 5px 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.btn:hover:not(:disabled) {
+    transform: translateY(-2px); /* Slight lift on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+.btn:active:not(:disabled) {
+    transform: translateY(0); /* Back down on click */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+    box-shadow: none;
+}
+
+.btn-build { background-color: var(--success-color); }
+.btn-build:hover:not(:disabled) { background-color: #218838; } /* Darker green */
+
+.btn-next { background-color: var(--primary-color); }
+.btn-next:hover:not(:disabled) { background-color: #0056b3; } /* Darker blue */
+
+.btn-restart { background-color: var(--warning-color); color: var(--dark-color); }
+.btn-restart:hover:not(:disabled) { background-color: #e0a800; } /* Darker yellow */
+
+
+/* --- Game Over Message --- */
+.game-over {
+    text-align: center;
+    border-color: var(--primary-color);
+    border-width: 2px;
+}
+.game-over h2 {
+    color: var(--primary-color);
+    border: none; /* Remove border for game over heading */
+}
+.final-score {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: var(--dark-color);
+    margin: 20px 0;
+}
+
+/* --- Footer --- */
+footer {
+    text-align: center;
+    margin-top: 40px;
+    color: var(--secondary-color);
+    font-size: 0.9em;
+}
+
+/* --- Responsive Adjustments (Example) --- */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    .container {
+        margin: 10px auto;
+    }
+    h1 {
+        font-size: 2em;
+    }
+    .card {
+        padding: 15px 20px;
+    }
+    .controls {
+        flex-direction: column; /* Stack controls vertically */
+        gap: 15px;
+    }
+    .control-group {
+        min-width: 100%; /* Take full width when stacked */
+    }
+    .btn {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+    .status-bar {
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+    }
+    .file-input-wrapper {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

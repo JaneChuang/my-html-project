@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>單字製造機 Pro 🚀</title>
+    <!-- Link Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Link External CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>單字製造機 Pro <span class="icon">🚀</span></h1>
+        </header>
+
+        <section class="file-loader card">
+            <h2><span class="icon">📁</span> 載入你的單字庫</h2>
+            <div class="file-input-wrapper">
+                <label for="csvFileInput" class="file-label">選擇 CSV 檔案:</label>
+                <input type="file" id="csvFileInput" accept=".csv">
+                <span id="fileName" class="file-name-display">未選擇檔案</span>
+            </div>
+             <div id="loadingIndicator" class="loading" style="display: none;">載入中...</div>
+            <p id="fileMessage" class="message">請選擇包含單字資料的 CSV 檔案 (UTF-8 編碼)。<br>格式: Word,Meaning,Prefix,Root,Suffix,Story</p>
+            <p id="loadError" class="message error"></p>
+        </section>
+
+        <section class="game-area card" style="display: none;">
+
+            <div class="status-bar">
+                <span id="progress" class="status-item">第 0 / 0 題</span>
+                <span id="score" class="status-item">得分: 0</span>
+            </div>
+
+            <div class="info-area">
+                <strong>🎯 目標意思:</strong>
+                <span id="meaning" class="target-meaning"></span>
+            </div>
+
+            <h3 class="controls-title"><span class="icon">🎮</span> 選擇零件:<span class="icon">🔧</span></h3>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="prefixSelect">字首 (Prefix)</label>
+                    <select id="prefixSelect" size="5"></select>
+                </div>
+                <div class="control-group">
+                    <label for="rootSelect">字根 (Root)</label>
+                    <select id="rootSelect" size="5"></select>
+                </div>
+                <div class="control-group">
+                    <label for="suffixSelect">字尾 (Suffix)</label>
+                    <select id="suffixSelect" size="5"></select>
+                </div>
+            </div>
+
+            <div class="results-area">
+                 <div id="selectionDisplay" class="result-item">你選擇的組合: <span>[?] + [?] + [?]</span></div>
+                 <div id="builtWordDisplay" class="result-item">製造出的單字: <span>...</span></div>
+                 <div id="feedback" class="feedback-box"></div>
+            </div>
+
+
+            <div class="button-group">
+                 <button id="buildButton" class="btn btn-build" disabled><span class="icon">🔩</span> 製造單字</button>
+                 <button id="nextButton" class="btn btn-next" disabled><span class="icon">▶️</span> 開始遊戲</button>
+            </div>
+        </section>
+
+        <section id="gameOverMessage" class="card game-over" style="display: none;">
+            <h2><span class="icon">🎉</span> 遊戲結束！<span class="icon">🎉</span></h2>
+            <p class="final-score">你的最終得分是: <span id="finalScore">0</span> / <span id="totalWordsEnd">0</span></p>
+            <button onclick="location.reload()" class="btn btn-restart"><span class="icon">🔄</span> 重新載入檔案玩一次</button>
+        </section>
+
+        <footer>
+            <p>由 Dr. E 製作的單字製造機</p>
+        </footer>
+    </div>
+
+    <!-- Link External JS -->
+    <script src="script.js"></script>
+</body>
+</html>
