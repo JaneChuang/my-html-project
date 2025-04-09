@@ -8,9 +8,6 @@ let shuffledIndices = [];
 let score = 0;
 let totalWords = 0;
 const EMPTY_COMPONENT_PLACEHOLDER = "[無]"; // Placeholder for empty parts
-// Check for Speech Synthesis support
-const synth = window.speechSynthesis;
-const supportsSpeech = !!synth;
 
 // --- DOM Elements ---
 const fileInput = document.getElementById('csvFileInput');
@@ -33,60 +30,22 @@ const builtWordDisplay = document.getElementById('builtWordDisplay').querySelect
 const gameOverMessage = document.getElementById('gameOverMessage');
 const finalScoreDisplay = document.getElementById('finalScore');
 const totalWordsEndDisplay = document.getElementById('totalWordsEnd');
-const pronounceButton = document.getElementById('pronounceButton'); // Get the new button
 
 
 // --- Event Listeners ---
 fileInput.addEventListener('change', handleFileSelect);
 buildButton.addEventListener('click', handleBuildWord);
 nextButton.addEventListener('click', handleNextWord);
+// Update selection display when dropdowns change
 prefixSelect.addEventListener('change', updateSelectionDisplay);
 rootSelect.addEventListener('change', updateSelectionDisplay);
 suffixSelect.addEventListener('change', updateSelectionDisplay);
-// Add listener for the pronounce button
-pronounceButton.addEventListener('click', handlePronounceWord);
-
 
 // --- Functions ---
 
-// Add a new function to handle pronunciation
-function handlePronounceWord() {
-    if (!supportsSpeech) {
-        alert("抱歉，您的瀏覽器不支援語音合成功能。");
-        return;
-    }
-    if (currentGameIndex < 0 || currentGameIndex >= totalWords) {
-        return; // No word selected yet or game over
-    }
-    if (synth.speaking) {
-        // Optional: Prevent spamming if already speaking
-        // console.log('SpeechSynthesis.speaking');
-        return;
-    }
-
-    const currentWordData = wordsData[shuffledIndices[currentGameIndex]];
-    const wordToSpeak = currentWordData.Word;
-
-    if (wordToSpeak) {
-        const utterThis = new SpeechSynthesisUtterance(wordToSpeak);
-        utterThis.lang = 'en-US'; // Set language to English (US). Adjust if needed (e.g., 'en-GB')
-        utterThis.pitch = 1;
-        utterThis.rate = 1;
-        utterThis.onerror = function (event) {
-            console.error('SpeechSynthesisUtterance.onerror', event);
-            feedbackArea.textContent = '抱歉，發音時發生錯誤。';
-            feedbackArea.className = 'feedback-box incorrect';
-        };
-        // console.log("Attempting to speak:", wordToSpeak);
-        synth.speak(utterThis);
-    } else {
-        console.error("Cannot pronounce: Word is empty or undefined.");
-    }
-}
-
 function handleFileSelect(event) {
     const file = event.target.files[0];
-    resetGameVisuals();
+    resetGameVisuals(); // Clear previous errors and states visually
 
     if (!file) {
         fileMessage.textContent = '未選擇任何檔案。';
@@ -94,7 +53,7 @@ function handleFileSelect(event) {
         return;
     }
 
-    fileNameDisplay.textContent = file.name;
+    fileNameDisplay.textContent = file.name; // Show selected file name
 
     if (!file.name.toLowerCase().endsWith('.csv')) {
          loadError.textContent = '錯誤：請選擇一個 .csv 檔案。';
@@ -102,34 +61,29 @@ function handleFileSelect(event) {
          return;
     }
 
-    loadingIndicator.style.display = 'block';
+    loadingIndicator.style.display = 'block'; // Show loading indicator
     fileMessage.textContent = '正在讀取檔案...';
 
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
+            // Use setTimeout to allow UI to update before heavy parsing starts
             setTimeout(() => {
                 parseCSV(e.target.result);
                 if(wordsData.length > 0) {
                     fileMessage.textContent = `成功載入 ${file.name} (${totalWords} 個單字)。`;
                     gameArea.style.display = 'block';
-                    nextButton.disabled = false;
-                    nextButton.textContent = `▶️ 開始遊戲 (${totalWords}題)`;
+                    nextButton.disabled = false; // Enable "Start Game" button
+                    nextButton.textContent = `▶️ 開始遊戲 (${totalWords}題)`; // Update button text
                     gameOverMessage.style.display = 'none';
-                    buildButton.disabled = true;
-                    loadingIndicator.style.display = 'none';
-                    // Check speech support and update button state/message
-                    if (!supportsSpeech) {
-                        pronounceButton.style.display = 'none'; // Hide button if not supported
-                        console.warn("瀏覽器不支援 Speech Synthesis API");
-                        // Optionally add a message somewhere
-                    }
+                    buildButton.disabled = true; // Build button disabled until game starts
+                    loadingIndicator.style.display = 'none'; // Hide loading
                 } else {
                     loadError.textContent = '錯誤：CSV 檔案為空或格式不符。';
                     resetGame();
                     loadingIndicator.style.display = 'none';
                 }
-            }, 10);
+            }, 10); // Small delay
 
         } catch (error) {
             console.error("解析 CSV 時發生錯誤:", error);
@@ -144,10 +98,11 @@ function handleFileSelect(event) {
         resetGame();
         loadingIndicator.style.display = 'none';
     };
-    reader.readAsText(file, 'UTF-8');
+    reader.readAsText(file, 'UTF-8'); // Specify UTF-8 encoding
 }
 
 function parseCSV(csvText) {
+    // Reset previous data (logic part)
     wordsData = [];
     uniquePrefixes = new Set([EMPTY_COMPONENT_PLACEHOLDER]);
     uniqueRoots = new Set();
@@ -181,16 +136,19 @@ function parseCSV(csvText) {
         throw new Error(`CSV 檔案缺少必要的標頭欄位: ${missingHeaders.join(', ')}`);
     }
 
-    const csvLineRegex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
+    // Regex to handle simple CSV cases, including quoted fields with commas inside
+    // Note: This is still basic and won't handle ALL edge cases of CSVs (e.g., escaped quotes within quotes)
+    const csvLineRegex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/; // Split by comma unless inside quotes
 
     for (let i = 1; i < lines.length; i++) {
         const line = lines[i].trim();
         if (!line) continue;
 
+        // Split using regex, then trim whitespace and remove quotes if present
         const values = line.split(csvLineRegex).map(val => {
             val = val.trim();
             if (val.startsWith('"') && val.endsWith('"')) {
-                return val.slice(1, -1).replace(/""/g, '"');
+                return val.slice(1, -1).replace(/""/g, '"'); // Remove surrounding quotes and handle escaped quotes ("")
             }
             return val;
         });
@@ -231,7 +189,7 @@ function parseCSV(csvText) {
 
 function populateDropdowns() {
     const sortedPrefixes = Array.from(uniquePrefixes).sort((a, b) => sortComponents(a, b));
-    const sortedRoots = Array.from(uniqueRoots).sort();
+    const sortedRoots = Array.from(uniqueRoots).sort(); // Roots likely don't need special sorting
     const sortedSuffixes = Array.from(uniqueSuffixes).sort((a, b) => sortComponents(a, b));
 
     fillSelectWithOptions(prefixSelect, sortedPrefixes);
@@ -239,11 +197,13 @@ function populateDropdowns() {
     fillSelectWithOptions(suffixSelect, sortedSuffixes);
 }
 
+// Helper for sorting, putting placeholder first
 function sortComponents(a, b) {
     if (a === EMPTY_COMPONENT_PLACEHOLDER) return -1;
     if (b === EMPTY_COMPONENT_PLACEHOLDER) return 1;
     return a.localeCompare(b);
 }
+
 
 function fillSelectWithOptions(selectElement, options) {
     selectElement.innerHTML = '';
@@ -254,6 +214,7 @@ function fillSelectWithOptions(selectElement, options) {
         selectElement.appendChild(option);
     });
     if (options.length > 0) {
+        // Ensure the placeholder is selected if it exists and is first
         const placeholderIndex = options.findIndex(opt => opt === EMPTY_COMPONENT_PLACEHOLDER);
         selectElement.selectedIndex = (placeholderIndex !== -1) ? placeholderIndex : 0;
     }
@@ -265,12 +226,13 @@ function fillSelectWithOptions(selectElement, options) {
  }
 
 function handleNextWord() {
-    if (currentGameIndex === -1) {
+    if (currentGameIndex === -1) { // Starting the game
         shuffledIndices = Array.from(wordsData.keys()).sort(() => Math.random() - 0.5);
         nextButton.textContent = '下一題 ▶️';
         fileInput.disabled = true;
         document.querySelector('.file-label').style.cursor = 'not-allowed';
         document.querySelector('.file-label').style.opacity = '0.6';
+
     }
 
     currentGameIndex++;
@@ -280,29 +242,25 @@ function handleNextWord() {
         return;
     }
 
-    // Cancel any ongoing speech before loading the next word
-    if (supportsSpeech && synth.speaking) {
-        synth.cancel();
-    }
-
     const currentWordData = wordsData[shuffledIndices[currentGameIndex]];
     meaningDisplay.textContent = currentWordData.Meaning;
 
+    // Reset UI for the new word
     feedbackArea.textContent = '';
-    feedbackArea.className = 'feedback-box';
+    feedbackArea.className = 'feedback-box'; // Reset feedback style
     builtWordDisplay.textContent = '...';
-    builtWordDisplay.style.color = 'var(--primary-color)';
+     builtWordDisplay.style.color = 'var(--primary-color)'; // Reset color
 
-    selectDefaultOption(prefixSelect);
-    selectDefaultOption(rootSelect);
-    selectDefaultOption(suffixSelect);
+    // Reset dropdowns intelligently (select placeholder if available, else first item)
+     selectDefaultOption(prefixSelect);
+     selectDefaultOption(rootSelect);
+     selectDefaultOption(suffixSelect);
 
     updateSelectionDisplay();
     updateStatusDisplay();
 
-    buildButton.disabled = false;
-    nextButton.disabled = true;
-    pronounceButton.disabled = !supportsSpeech; // Enable pronounce button if supported
+    buildButton.disabled = false; // Enable build for the new word
+    nextButton.disabled = true; // Disable next until built
 
     gameArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -317,8 +275,9 @@ function updateSelectionDisplay() {
      const selectedPrefix = prefixSelect.value || '[?]';
      const selectedRoot = rootSelect.value || '[?]';
      const selectedSuffix = suffixSelect.value || '[?]';
+     // Use textContent for the outer div, innerHTML for the span if needed
      selectionDisplay.textContent = `[${selectedPrefix}] + [${selectedRoot}] + [${selectedSuffix}]`;
-     selectionDisplay.style.color = 'var(--primary-color)';
+     selectionDisplay.style.color = 'var(--primary-color)'; // Keep it consistent
 }
 
 
@@ -334,23 +293,25 @@ function handleBuildWord() {
     const actualSuffix = selectedSuffixValue === EMPTY_COMPONENT_PLACEHOLDER ? "" : selectedSuffixValue;
 
     const builtWord = actualPrefix + actualRoot + actualSuffix;
-    builtWordDisplay.textContent = `${builtWord}`;
+    builtWordDisplay.textContent = `${builtWord}`; // Show built word directly in span
 
     const correctWordInfo = wordsData[shuffledIndices[currentGameIndex]];
     const correctWord = correctWordInfo.Word;
 
     feedbackArea.textContent = '';
-    feedbackArea.className = 'feedback-box';
+    feedbackArea.className = 'feedback-box'; // Reset class
 
     if (builtWord === correctWord) {
         score++;
         feedbackArea.innerHTML = `<span class="icon">✅</span> <strong>成功！</strong> ${correctWord} 的確是「${correctWordInfo.Meaning}」。<br><strong>拆解：</strong>${correctWordInfo.Story}`;
         feedbackArea.classList.add('correct');
-        builtWordDisplay.style.color = 'var(--success-color)';
+        builtWordDisplay.style.color = 'var(--success-color)'; // Green text for correct word
+        // Add a subtle animation/highlight to score maybe?
         scoreDisplay.style.transition = 'transform 0.3s ease';
         scoreDisplay.style.transform = 'scale(1.1)';
         setTimeout(() => { scoreDisplay.style.transform = 'scale(1)'; }, 300);
 
+		// 答對了才禁用製造，啟用下一題
 		buildButton.disabled = true;
 		nextButton.disabled = false;
 
@@ -358,14 +319,19 @@ function handleBuildWord() {
 		const correctPrefixDisplay = correctWordInfo.Prefix || EMPTY_COMPONENT_PLACEHOLDER;
 		const correctRootDisplay = correctWordInfo.Root;
 		const correctSuffixDisplay = correctWordInfo.Suffix || EMPTY_COMPONENT_PLACEHOLDER;
-		feedbackArea.innerHTML = `<span class="icon">❌</span> <strong>錯誤！</strong> 製造的單字不正確。<br><strong>提示：</strong>${correctWordInfo.Story}<br><strong>正解提示：</strong>${correctPrefixDisplay} + ${correctRootDisplay} + ${correctSuffixDisplay} (但正確單字本身先不顯示)`;
+		feedbackArea.innerHTML = `<span class="icon">❌</span> <strong>錯誤！</strong> 製造的單字不正確。<br><strong>提示：</strong>${correctWordInfo.Story}<br><strong>正解提示：</strong>${correctPrefixDisplay} + ${correctRootDisplay} + ${correctSuffixDisplay} (但正確單字本身先不顯示)`; // 可以選擇是否顯示完整答案提示
 		feedbackArea.classList.add('incorrect');
 		builtWordDisplay.style.color = 'var(--danger-color)';
 
-        // Allow retrying, so don't disable build or enable next here
+		// **重點：不再禁用 buildButton 或啟用 nextButton**
+		// 使用者可以更改選項後再次點擊 "製造單字"
+		// buildButton.disabled = true;  <-- 刪除或註解掉這行
+		// nextButton.disabled = false; <-- 刪除或註解掉這行
     }
 
-	updateStatusDisplay();
+	updateStatusDisplay(); // 更新分數顯示（即使分數沒變也要執行，以防萬一）
+	// buildButton.disabled = true; // <-- 把這兩行移到 **答對** 的區塊內
+	// nextButton.disabled = false;// <-- 把這兩行移到 **答對** 的區塊內
 }
 
 function showGameOver() {
@@ -373,15 +339,11 @@ function showGameOver() {
     finalScoreDisplay.textContent = score;
     totalWordsEndDisplay.textContent = totalWords;
     gameOverMessage.style.display = 'block';
-    pronounceButton.disabled = true; // Disable pronounce button at game over
-    // Cancel any speech if game ends abruptly
-    if (supportsSpeech && synth.speaking) {
-        synth.cancel();
-    }
     gameOverMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
  function resetGameVisuals() {
+     // Reset visual elements without resetting game logic state
      loadError.textContent = '';
      fileMessage.textContent = '請選擇包含單字資料的 CSV 檔案 (UTF-8 編碼)。';
      gameArea.style.display = 'none';
@@ -396,16 +358,11 @@ function showGameOver() {
      nextButton.textContent = '▶️ 開始遊戲';
      nextButton.disabled = true;
      buildButton.disabled = true;
-     pronounceButton.disabled = true; // Disable pronounce button on reset
-     pronounceButton.style.display = 'inline-block'; // Ensure it's visible initially (unless hidden later for non-support)
-     loadingIndicator.style.display = 'none';
-     // Cancel any ongoing speech on reset
-    if (supportsSpeech && synth.speaking) {
-        synth.cancel();
-    }
+      loadingIndicator.style.display = 'none';
  }
 
  function resetGame() {
+     // Resets both logic and visuals (called on error or explicit restart)
      wordsData = [];
      uniquePrefixes = new Set();
      uniqueRoots = new Set();
@@ -415,22 +372,23 @@ function showGameOver() {
      score = 0;
      totalWords = 0;
 
-     fileInput.value = '';
+     fileInput.value = ''; // Clear selected file in input
 
-     resetGameVisuals();
+     resetGameVisuals(); // Reset the UI elements
 
+     // Clear dropdowns explicitly
      prefixSelect.innerHTML = '';
      rootSelect.innerHTML = '';
      suffixSelect.innerHTML = '';
 
-     updateStatusDisplay();
-     updateSelectionDisplay();
+     updateStatusDisplay(); // Reset score/progress display to 0
+     updateSelectionDisplay(); // Reset selection display
       builtWordDisplay.textContent = '...';
       builtWordDisplay.style.color = 'var(--primary-color)';
       feedbackArea.textContent = '';
       feedbackArea.className = 'feedback-box';
  }
 
- // Initial setup call
+ // Initial setup call to reset displays visually
  resetGameVisuals();
  updateSelectionDisplay();
