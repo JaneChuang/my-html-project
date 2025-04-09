@@ -161,23 +161,30 @@ input[type="file"] + label:hover {
      color: var(--dark-color);
 }
 
+/* --- Updated Info Area with Flexbox for Pronunciation Button --- */
 .info-area {
+    display: flex; /* Use flexbox for easier alignment */
+    align-items: center; /* Vertically align items */
+    justify-content: center; /* Center items horizontally */
+    flex-wrap: wrap; /* Allow wrapping */
+    gap: 10px; /* Add some space between elements */
     margin-bottom: 25px;
     padding: 15px;
     background: #e6f2ff; /* Light blue background */
     border: 1px solid #b3d7ff;
     border-radius: var(--border-radius);
-    text-align: center;
+    /* Removed text-align: center as flexbox handles centering */
 }
 .info-area strong {
     color: var(--primary-color);
     font-size: 1.2em;
-    margin-right: 10px;
+    margin-right: 5px; /* Reduced margin */
 }
 .target-meaning {
     font-size: 1.3em;
     font-weight: bold;
     color: var(--dark-color);
+    margin-right: 5px; /* Add margin to separate from button */
 }
 
 
@@ -279,30 +286,26 @@ select option {
     border-style: solid;
 }
 
-
+/* --- Sticky Button Group --- */
 .game-area {
-    position: relative; /* 讓 sticky 定位相對於此 */
-    /* 可能需要設定一個最小高度或確保其可以滾動內部內容 */
-    /* 例如： padding-bottom: 80px; /* 為固定的按鈕區留出空間 */
+    position: relative; /* Required for sticky positioning context */
+     /* Ensure there's enough padding at the bottom if content is short */
+     padding-bottom: 80px; /* Adjust as needed based on button group height */
 }
 
-/* --- Buttons --- */
 .button-group {
     position: sticky;
-    bottom: 15px; /* 距離 game-area 底部的距離 */
-    background-color: var(--card-background); /* 給個背景色避免透明 */
-    padding: 10px 0; /* 增加一點上下內邊距 */
-    margin-top: 15px; /* 保持與上方元素的距離 */
-    z-index: 10; /* 確保在其他元素之上 */
-    border-top: 1px solid #eee; /* 可選：加個分隔線 */
+    bottom: 15px; /* Distance from the bottom of the game-area */
+    background-color: var(--card-background); /* Background to prevent transparency */
+    padding: 10px 0; /* Vertical padding */
+    margin-top: 20px; /* Space above the button group */
+    z-index: 10; /* Ensure it's above other content within game-area */
+    border-top: 1px solid #eee; /* Optional separator line */
+    text-align: center; /* Center buttons within the group */
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.05); /* Optional subtle shadow */
 }
 
-/*
-.button-group {
-    text-align: center;
-    margin-top: 25px;
-}
-*/
+/* --- General Button Styles --- */
 .btn {
     background-color: var(--secondary-color); /* Default gray */
     color: white;
@@ -329,8 +332,10 @@ select option {
     cursor: not-allowed;
     opacity: 0.7;
     box-shadow: none;
+    transform: none; /* Prevent hover/active transforms when disabled */
 }
 
+/* Specific Button Types */
 .btn-build { background-color: var(--success-color); }
 .btn-build:hover:not(:disabled) { background-color: #218838; } /* Darker green */
 
@@ -339,6 +344,51 @@ select option {
 
 .btn-restart { background-color: var(--warning-color); color: var(--dark-color); }
 .btn-restart:hover:not(:disabled) { background-color: #e0a800; } /* Darker yellow */
+
+/* --- Pronunciation Button Styles --- */
+.btn-pronounce {
+    background-color: var(--warning-color); /* Orange/Yellow */
+    color: var(--dark-color);
+    border: none;
+    padding: 5px 10px; /* Smaller padding for an icon button */
+    border-radius: 50%; /* Make it round */
+    cursor: pointer;
+    font-size: 1em; /* Adjust icon size if needed */
+    line-height: 1; /* Ensure icon is centered vertically */
+    transition: all var(--transition-speed) ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: inline-flex; /* Use flex to center icon */
+    align-items: center;
+    justify-content: center;
+    width: 35px; /* Fixed width */
+    height: 35px; /* Fixed height */
+    /* Override general button margins if necessary */
+    margin: 0 5px; /* Adjust margin */
+}
+
+.btn-pronounce .icon {
+    margin-right: 0; /* Remove default icon margin */
+}
+
+.btn-pronounce:hover:not(:disabled) {
+    background-color: #e0a800; /* Darker yellow */
+    transform: scale(1.1); /* Slightly larger on hover */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.btn-pronounce:active:not(:disabled) {
+    transform: scale(1); /* Back to normal size on click */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure disabled state for pronounce button overrides hover effects */
+.btn-pronounce:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+    transform: none; /* Prevent hover/active transforms */
+}
 
 
 /* --- Game Over Message --- */
@@ -366,7 +416,7 @@ footer {
     font-size: 0.9em;
 }
 
-/* --- Responsive Adjustments (Example) --- */
+/* --- Responsive Adjustments --- */
 @media (max-width: 600px) {
     body {
         padding: 10px;
@@ -399,5 +449,23 @@ footer {
     .file-input-wrapper {
         flex-direction: column;
         gap: 10px;
+    }
+    .info-area {
+        justify-content: center; /* Keep centered on mobile */
+        padding: 10px;
+    }
+    .target-meaning {
+        font-size: 1.2em; /* Slightly smaller on mobile */
+    }
+    .btn-pronounce {
+        width: 32px; /* Slightly smaller */
+        height: 32px;
+    }
+    .button-group {
+        /* Maybe less sticky distance on mobile? */
+        bottom: 5px;
+    }
+    .game-area {
+         padding-bottom: 70px; /* Adjust if needed for mobile */
     }
 }
